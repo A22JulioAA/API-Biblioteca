@@ -27,3 +27,23 @@
 2024-11-21 20:57:40 - run - INFO - Peticion a /check: 192.168.1.166
 2024-11-21 20:57:47 - asyncio - DEBUG - Using selector: SelectSelector
 2024-11-21 20:57:53 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:07:24 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:07:30 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:07:59 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:08:45 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:10:57 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:11:01 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:23:33 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:23:55 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:24:00 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:24:57 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:25:06 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:25:10 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:25:29 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:25:30 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:25:36 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:25:42 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:25:49 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:26:03 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:26:49 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 21:26:55 - asyncio - DEBUG - Using selector: SelectSelector
