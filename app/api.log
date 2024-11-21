@@ -4,3 +4,26 @@
 2024-11-21 20:52:31 - asyncio - DEBUG - Using selector: SelectSelector
 2024-11-21 20:52:45 - run - INFO - Petición a /check: 192.168.1.166
 2024-11-21 20:52:57 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 20:56:36 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:38 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:38 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:39 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:39 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:39 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:45 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:46 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:51 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:51 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:52 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:52 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:52 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:54 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:54 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:56:55 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:57:29 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 20:57:32 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:57:39 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:57:40 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:57:40 - run - INFO - Peticion a /check: 192.168.1.166
+2024-11-21 20:57:47 - asyncio - DEBUG - Using selector: SelectSelector
+2024-11-21 20:57:53 - asyncio - DEBUG - Using selector: SelectSelector
