@@ -14,6 +14,9 @@ from database import init_db, get_db, get_db_info, insertar_datos_ejemplo
 # Modelos para crear las tablas de la base de datos
 from models import libro, user, prestamo, prestamo_libros
 
+# Importamos las rutas de la API
+from routes.r_libro import libros_router
+
 # Configuramos el logger
 logging.basicConfig(
     filename='../api.log',
@@ -40,6 +43,9 @@ app = FastAPI(
 
 # Logger para la API
 logger = logging.getLogger(__name__)
+
+# Añadimos las rutas a la API
+app.include_router(libros_router)
 
 # Inicializamos la base de datos
 @app.on_event("startup")
