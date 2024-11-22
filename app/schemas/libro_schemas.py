@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class LibroBase(BaseModel):
     isbn: str
@@ -33,8 +34,8 @@ class LibroResponse(LibroBase):
 
 class LibroInDB(LibroBase):
     id: int
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True

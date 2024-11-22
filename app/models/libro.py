@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 from sqlalchemy.types import Numeric
 
 from database import Base
@@ -17,3 +18,7 @@ class Libro(Base):
     num_paginas = Column(Integer, nullable=True)
     ano_edicion = Column(Integer, nullable=True)
     precio = Column(Numeric(10, 2), nullable=True)
+    created_at = Column(String, nullable=False)
+    updated_at = Column(String, nullable=True)
+
+    prestamos = relationship("Prestamo", secondary="prestamo_libro", back_populates="libros")

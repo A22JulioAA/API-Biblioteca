@@ -12,7 +12,7 @@ from utilities import get_ip
 from database import init_db, get_db, get_db_info
 
 # Modelos para crear las tablas de la base de datos
-from models import libro
+from models import libro, user, prestamo, prestamo_libros
 
 # Configuramos el logger
 logging.basicConfig(
