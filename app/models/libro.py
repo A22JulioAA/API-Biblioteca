@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import Numeric
 
 from database import Base
+from models.prestamo_libros import prestamos_libros
 
 class Libro(Base):
     __tablename__ = 'libros'
@@ -21,4 +22,4 @@ class Libro(Base):
     created_at = Column(String, nullable=False)
     updated_at = Column(String, nullable=True)
 
-    prestamos = relationship("Prestamo", secondary="prestamo_libro", back_populates="libros")
+    prestamos = relationship("Prestamo", secondary="prestamos_libros", back_populates="libros")

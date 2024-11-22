@@ -9,7 +9,7 @@ import time
 
 # Importamos las librerías/funciones propias
 from utilities import get_ip
-from database import init_db, get_db, get_db_info
+from database import init_db, get_db, get_db_info, insertar_datos_ejemplo
 
 # Modelos para crear las tablas de la base de datos
 from models import libro, user, prestamo, prestamo_libros
@@ -78,6 +78,20 @@ def db():
     logger.info(f'Información de la base de datos: {db_info}')
 
     return db_info
+
+@app.get(
+        '/db/insert',
+        summary='Insertar datos de ejemplo',
+        description='Inserta datos de ejemplo en la base de datos',
+)
+def insert():
+    logger.info('Peticion a /db/insert. Insertando datos de ejemplo...')
+
+    insertar_datos_ejemplo()
+
+    logger.info('Datos de ejemplo insertados correctamente')
+
+    return {'status': 'Datos de ejemplo insertados correctamente'}
 
 if __name__ == '__main__':
     uvicorn.run(app='run:app', host='0.0.0.0', port=8995, reload=True, reload_excludes=['api.log'])

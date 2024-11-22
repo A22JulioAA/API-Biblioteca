@@ -80,3 +80,31 @@ def get_db_info ():
             'status': f'Error en la base de datos: {e}',
             'url': str(engine.url),
         }
+    
+def insertar_datos_ejemplo ():
+    """
+    Función para insertar datos de ejemplo en la base de datos
+
+    """
+    from models.libro import Libro
+    from models.user import User
+    from models.prestamo import Prestamo
+
+    from datetime import datetime
+
+    db = SessionLocal()
+
+    libro1 = db.query(Libro).filter(Libro.id == 1).first()
+    libro2 = db.query(Libro).filter(Libro.id == 2).first()
+
+    prestamo = Prestamo(
+        fecha_prestamo=datetime.now(),
+        fecha_devolucion=datetime.now(),
+        usuario_id=3,
+        libros=[libro1, libro2],
+    )
+
+
+    db.add(prestamo)
+    db.commit()
+    db.refresh(prestamo)
