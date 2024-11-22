@@ -10,7 +10,7 @@ class LibroBase(BaseModel):
     pais: str
     idioma: str
     num_paginas: int
-    year_edicion: int
+    ano_edicion: int
     precio: float
 
 class LibroCreate(LibroBase):
