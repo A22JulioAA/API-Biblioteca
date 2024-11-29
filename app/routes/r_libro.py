@@ -168,13 +168,21 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
     try:
         # Comprobamos que no haya un libro con el mismo ISBN
         if db.query(Libro).filter(Libro.isbn == libro.isbn).first():
-            raise HTTPException(status_code=409, detail=f'El libro con el ISBN - ${libro.isbn} - ya existe')
+            raise HTTPException(status_code=409, detail=f'El libro con el ISBN - {libro.isbn} - ya existe')
+
+        # Creamos el objeto Libro
+        nuevoLibro = Libro(**libro.dict())
+        
+        # Añadimos la fecha de creación y actualización
+        nuevoLibro.created_at = datetime.now()
+        nuevoLibro.updated_at = datetime.now()
 
         # Añadimos el libro a la base de datos
-        db.add(libro)
+        db.add(nuevoLibro)
         db.commit()
+        db.refresh(nuevoLibro)
 
-        return libro
+        return nuevoLibro
 
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e))
