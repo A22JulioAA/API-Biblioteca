@@ -24,6 +24,12 @@ class GeneroResponse(GeneroBase):
     class Config:
         orm_mode = True
 
+class GeneroLibroResponse(BaseModel):
+    nombre: str
+
+    class Config:
+        orm_mode = True
+
 class GeneroInDB(GeneroBase):
     id: int
     created_at: datetime
