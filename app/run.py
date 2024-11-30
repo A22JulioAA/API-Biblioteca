@@ -5,6 +5,7 @@ import logging
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import time
 
 # Importamos el logger de la API
@@ -38,6 +39,14 @@ app = FastAPI(
         'name': 'GNU Affero General Public License v3',
         'url': 'https://www.gnu.org/licenses/agpl-3.0.html',
     },
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 @app.middleware("http")
