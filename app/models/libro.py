@@ -13,7 +13,6 @@ class Libro(Base):
     autor = Column(String, nullable=False, default='Anónimo')
     descripcion = Column(String, nullable=True)
     editorial = Column(String, nullable=True)
-    genero = Column(String, nullable=True)
     pais = Column(String, nullable=True)
     idioma = Column(String, nullable=True)
     num_paginas = Column(Integer, nullable=True)
@@ -23,3 +22,4 @@ class Libro(Base):
     updated_at = Column(String, nullable=True)
 
     prestamos = relationship("Prestamo", secondary="prestamos_libros", back_populates="libros")
+    generos = relationship('Genero', secondary='libros_generos', back_populates='libros')
