@@ -10,6 +10,9 @@ from sqlalchemy.exc import SQLAlchemyError
 # Importamos el logger
 from log_config import setup_logger
 
+# Importamos las funciones de validación
+from validaciones import validar_isbn
+
 # Importamos los modelos y esquemas necesarios
 from models.libro import Libro
 from schemas.libro_schemas import LibroResponse, LibroCreate
@@ -108,8 +111,7 @@ async def get_libro_by_id(id: int, db: Session = Depends(get_db)):
 async def get_libro_by_isbn(isbn: str, db: Session = Depends(get_db)):
     try:
         # Comprobamos que el ISBN tenga 13 caracteres TODO: Podría hacerse una validación de ISBN de 10 dígitos
-        if len(isbn) != 13:
-            raise HTTPException(status_code=400, detail='El ISBN debe tener 13 caracteres')
+        validar_isbn(isbn)
         
         # Consultamos el libro por su ISBN
         libro = db.query(Libro).filter(Libro.isbn == isbn).first()
