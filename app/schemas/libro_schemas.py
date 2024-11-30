@@ -1,13 +1,16 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from .genero_schemas import GeneroResponse
+
 class LibroBase(BaseModel):
     isbn: str
     titulo: str
     autor: str
     descripcion: str
     editorial: str
-    genero: str
+    # Estos enteros son los IDs de los géneros
+    genero: list[int]
     pais: str
     idioma: str
     num_paginas: int
@@ -20,7 +23,7 @@ class LibroCreate(LibroBase):
     autor: str = "J.R.R. Tolkien"
     descripcion: str = "Un anillo para gobernarlos a todos, un anillo para encontrarlos, un anillo para atraerlos a todos y atarlos en las tinieblas."
     editorial: str = "Minotauro"
-    genero: str = "Fantasía"
+    genero: list[int] = [1, 2]
     pais: str = "Reino Unido"
     idioma: str = "Español"
     num_paginas: int = 1216
@@ -38,6 +41,7 @@ class Libro(LibroBase):
 
 class LibroResponse(LibroBase):
     id: int
+    genero: list[GeneroResponse]
 
     class Config:
         orm_mode = True

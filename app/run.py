@@ -19,6 +19,7 @@ from models import libro, user, prestamo, prestamo_libros, genero, libros_genero
 
 # Importamos las rutas de la API
 from routes.r_libro import libros_router
+from routes.r_genero import generos_router
 
 # Inicializamos el logger
 user_logger, internal_logger = setup_logger()
@@ -52,6 +53,7 @@ async def log_requests(request: Request, call_next):
 
 # Añadimos las rutas a la API
 app.include_router(libros_router)
+app.include_router(generos_router)
 
 # Inicializamos la base de datos
 @app.on_event("startup")
