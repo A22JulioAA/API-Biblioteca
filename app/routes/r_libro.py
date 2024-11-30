@@ -36,7 +36,7 @@ user_logger, internal_logger = setup_logger()
     responses={
         200: {
             'description': 'Lista de libros',
-            'model': LibroResponse
+            'model': list[LibroResponse]
         },
         404: {
             'description': 'No hay libros registrados'
