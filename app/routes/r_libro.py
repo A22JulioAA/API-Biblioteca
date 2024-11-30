@@ -1,20 +1,30 @@
 # Rutas para la entidad Libro
 
+# Importamos las librerías necesarias
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
+# Importamos el logger
+from log_config import setup_logger
+
+# Importamos los modelos y esquemas necesarios
 from models.libro import Libro
 from schemas.libro_schemas import LibroResponse, LibroCreate
 
+# Importamos la función para obtener la base de datos
 from database import get_db
 
+# Creamos el router para los libros
 libros_router = APIRouter(
     prefix='/libros',
     tags=['Libros']
 )
+
+# Configuramos el logger
+user_logger, internal_logger = setup_logger()
 
 # Ruta para obtener todos los libros
 @libros_router.get(
@@ -182,6 +192,7 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(nuevoLibro)
 
+        user_logger.info(f'Libro añadido: {nuevoLibro.titulo} - {nuevoLibro.isbn}')
         return nuevoLibro
 
     except SQLAlchemyError as e:

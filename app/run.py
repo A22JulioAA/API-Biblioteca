@@ -3,9 +3,12 @@
 # Importamos las librerías necesarias de Python
 import logging
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
 import time
+
+# Importamos el logger de la API
+from log_config import setup_logger
 
 # Importamos las librerías/funciones propias
 from utilities import get_ip
@@ -17,13 +20,8 @@ from models import libro, user, prestamo, prestamo_libros
 # Importamos las rutas de la API
 from routes.r_libro import libros_router
 
-# Configuramos el logger
-logging.basicConfig(
-    filename='../api.log',
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    )
+# Inicializamos el logger
+user_logger, internal_logger = setup_logger()
 
 app = FastAPI(
     title='API básica biblioteca',
@@ -41,8 +39,16 @@ app = FastAPI(
     },
 )
 
-# Logger para la API
-logger = logging.getLogger(__name__)
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+
+    user_logger.info(f"{request.client.host} - {request.method} - {request.url.path} - {response.status_code} - {process_time:.2f}ms")
+
+    return response
+
 
 # Añadimos las rutas a la API
 app.include_router(libros_router)
@@ -50,13 +56,13 @@ app.include_router(libros_router)
 # Inicializamos la base de datos
 @app.on_event("startup")
 def startup ():
-    logger.info('Iniciando la base de datos...')
+    internal_logger.info('Iniciando la base de datos...')
 
     try:
         init_db()
-        logger.info('Base de datos iniciada correctamente')
+        internal_logger.info('Base de datos iniciada correctamente')
     except Exception as e:
-        logger.error(f'Error al iniciar la base de datos: {e}')
+        internal_logger.error(f'Error al iniciar la base de datos: {e}')
         raise HTTPException(status_code=500, detail='Error al iniciar la base de datos')
 
 # Endpoint para comprobar que la API está funcionando
@@ -67,7 +73,7 @@ def startup ():
 )
 def check():
     ip = get_ip()
-    logger.info(f'Peticion a /check: {ip}')
+    internal_logger.info(f'Peticion a /check: {ip}')
     return {'IP': ip, 'status': 'API en funcionamiento' if ip else 'API no disponible'}
 
 # Endpoint para comprobar la base de datos
@@ -77,27 +83,13 @@ def check():
         description='Comprueba que la base de datos está funcionando correctamente',
 )
 def db():
-    logger.info('Peticion a /db. Comprobando base de datos...')
+    internal_logger.info('Peticion a /db. Comprobando base de datos...')
 
     db_info = get_db_info()
 
-    logger.info(f'Información de la base de datos: {db_info}')
+    internal_logger.info(f'Información de la base de datos: {db_info}')
 
     return db_info
-
-@app.get(
-        '/db/insert',
-        summary='Insertar datos de ejemplo',
-        description='Inserta datos de ejemplo en la base de datos',
-)
-def insert():
-    logger.info('Peticion a /db/insert. Insertando datos de ejemplo...')
-
-    insertar_datos_ejemplo()
-
-    logger.info('Datos de ejemplo insertados correctamente')
-
-    return {'status': 'Datos de ejemplo insertados correctamente'}
 
 if __name__ == '__main__':
     uvicorn.run(app='run:app', host='0.0.0.0', port=8995, reload=True, reload_excludes=['api.log'])
