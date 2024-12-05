@@ -16,19 +16,19 @@ class Genero(GeneroBase):
     id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class GeneroResponse(GeneroBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class GeneroLibroResponse(BaseModel):
     nombre: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class GeneroInDB(GeneroBase):
     id: int
@@ -36,4 +36,4 @@ class GeneroInDB(GeneroBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

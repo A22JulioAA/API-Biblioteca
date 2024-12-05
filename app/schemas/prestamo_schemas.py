@@ -25,7 +25,7 @@ class PrestamoResponse(PrestamoBase):
     libros_id: list[int]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Prestamo(PrestamoBase):
     pass

@@ -37,14 +37,14 @@ class Libro(LibroBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class LibroResponse(LibroBase):
     id: int
     genero: list[GeneroResponse]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class LibroInDB(LibroBase):
     id: int
@@ -52,7 +52,7 @@ class LibroInDB(LibroBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 
