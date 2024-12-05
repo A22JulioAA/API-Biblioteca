@@ -31,7 +31,16 @@ class LibroCreate(LibroBase):
     precio: float 
 
 class LibroUpdate(LibroBase):
-    pass
+    titulo: str = None
+    autor: str = None
+    descripcion: str = None
+    editorial: str = None
+    generos: list[int] = None
+    pais: str = None
+    idioma: str = None
+    num_paginas: int = None
+    ano_edicion: int = None
+    precio: float = None
 
 class Libro(LibroBase):
     id: int

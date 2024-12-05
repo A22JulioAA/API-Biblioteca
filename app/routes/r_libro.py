@@ -18,7 +18,7 @@ from functions import generar_pdf
 
 # Importamos los modelos y esquemas necesarios
 from models.libro import Libro
-from schemas.libro_schemas import LibroResponse, LibroCreate
+from schemas.libro_schemas import LibroResponse, LibroCreate, LibroUpdate
 from models.genero import Genero
 
 # Importamos la función para obtener la base de datos
@@ -235,6 +235,86 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
         internal_logger.error(f'Error al añadir el libro: {str(e)}')
         raise HTTPException(status_code=500, detail='Error añadiendo el libro')
     
+# Ruta para actualizar un libro
+@libros_router.put(
+    '/{id}',
+    description='Actualizar un libro',
+    response_model=LibroResponse,
+    responses={
+        200: {
+            'description': 'Libro actualizado',
+            'model': LibroResponse
+        },
+        400: {
+            'description': 'Datos incorrectos'
+        },
+        404: {
+            'description': 'Libro no encontrado'
+        },
+        500: {
+            'description': 'Error del servidor'
+        }
+    }
+)
+async def update_libro(id: int, libro_update: LibroUpdate, db: Session = Depends(get_db)):
+    try:
+        libro = db.query(Libro).filter(Libro.id == id).first()
+
+        # Si el libro no existe, lanzamos una excepción
+        if not libro:
+            raise HTTPException(status_code=404, detail='Libro no encontrado')
+        
+        # Obtenemos los géneros del libro
+        if libro_update.generos:
+            generos = db.query(Genero).filter(Genero.id.in_(libro_update.generos)).all()
+
+            if len(generos) != len(libro_update.generos):
+                raise HTTPException(status_code=400, detail='Uno o más géneros no existen')
+            
+        if libro_update.isbn and libro.isbn != libro_update.isbn:
+            validar_isbn(libro_update.isbn)
+            if db.query(Libro).filter(Libro.isbn == libro_update.isbn).first():
+                raise HTTPException(status_code=409, detail=f'El libro con el ISBN - {libro_update.isbn} - ya existe')
+            
+        # Actualizamos los datos del libro
+        if libro_update.isbn:
+            libro.isbn = libro_update.isbn
+        if libro_update.titulo:
+            libro.titulo = libro_update.titulo
+        if libro_update.autor:
+            libro.autor = libro_update.autor
+        if libro_update.descripcion:
+            libro.descripcion = libro_update.descripcion
+        if libro_update.editorial:
+            libro.editorial = libro_update.editorial
+        if libro_update.pais:
+            libro.pais = libro_update.pais
+        if libro_update.idioma:
+            libro.idioma = libro_update.idioma
+        if libro_update.num_paginas:
+            libro.num_paginas = libro_update.num_paginas
+        if libro_update.ano_edicion:
+            libro.ano_edicion = libro_update.ano_edicion
+        if libro_update.precio:
+            libro.precio = libro_update.precio
+        if libro_update.generos:
+            generos = db.query(Genero).filter(Genero.id.in_(libro_update.generos)).all()
+            libro.generos = generos
+
+        # Actualizamos la fecha de actualización
+        libro.updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Guardamos los cambios en la base de datos
+        db.commit()
+        db.refresh(libro)
+
+        user_logger.info(f'Libro actualizado: {libro.titulo} - {libro.isbn}')
+        return libro
+    
+    except SQLAlchemyError as e:
+        internal_logger.error(f'Error al actualizar el libro: {str(e)}')
+        raise HTTPException(status_code=500, detail='Error actualizando el libro')
+
 # Ruta para descargar un PDF con la lista de libros
 @libros_router.get(
     '/pdf',
