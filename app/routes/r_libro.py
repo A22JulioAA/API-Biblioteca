@@ -13,6 +13,9 @@ from log_config import setup_logger
 # Importamos las funciones de validación
 from validaciones import validar_isbn
 
+# Importamos las funciones necesarias para crear el pdf
+from functions import generar_pdf
+
 # Importamos los modelos y esquemas necesarios
 from models.libro import Libro
 from schemas.libro_schemas import LibroResponse, LibroCreate
@@ -200,4 +203,29 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-    
+# Ruta para descargar un PDF con la lista de libros
+@libros_router.get(
+    '/pdf',
+    description='Descargar un PDF con la lista de libros',
+    responses={
+        200: {
+            'description': 'PDF descargado'
+        },
+        500: {
+            'description': 'Error del servidor'
+        }
+    }
+)
+async def download_pdf(db: Session = Depends(get_db)):
+    try:
+        # Consultamos los libros de la base de datos
+        libros = db.query(Libro).all()
+
+        # Si no hay libros, lanzamos una excepción
+        if not libros:
+            raise HTTPException(status_code=404, detail='No hay libros registrados')
+        
+        # Generamos el PDF
+        generar_pdf(libros, 'lista_libros.pdf')
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail=str(e))
