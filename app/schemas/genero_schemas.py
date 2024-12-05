@@ -10,7 +10,8 @@ class GeneroCreate(GeneroBase):
     pass
 
 class GeneroUpdate(GeneroBase):
-    pass
+    nombre: str = None
+    descripcion: str = None
 
 class Genero(GeneroBase):
     id: int
