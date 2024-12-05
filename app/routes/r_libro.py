@@ -2,7 +2,7 @@
 
 # Importamos las librerías necesarias
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Path
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -19,6 +19,7 @@ from functions import generar_pdf
 # Importamos los modelos y esquemas necesarios
 from models.libro import Libro
 from schemas.libro_schemas import LibroResponse, LibroCreate
+from models.genero import Genero
 
 # Importamos la función para obtener la base de datos
 from database import get_db
@@ -36,6 +37,7 @@ user_logger, internal_logger = setup_logger()
 @libros_router.get(
     '/',
     description='Obtener todos los libros',
+    response_model=list[LibroResponse],
     responses={
         200: {
             'description': 'Lista de libros',
@@ -61,12 +63,14 @@ async def get_libros(db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail='No hay libros registrados')
         
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        internal_logger.error(f'Error al obtener los libros: {str(e)}')
+        raise HTTPException(status_code=500, detail='Error obteniendo los libros')
     
 # Ruta para obtener un libro por su ID
 @libros_router.get(
     '/{id}',
     description='Obtener un libro por su ID',
+    response_model=LibroResponse,
     responses={
         200: {
             'description': 'Libro encontrado',
@@ -75,12 +79,15 @@ async def get_libros(db: Session = Depends(get_db)):
         404: {
             'description': 'Libro no encontrado'
         },
+        422: {
+            'description': 'ID incorrecto'
+        },
         500: {
             'description': 'Error del servidor'
         }
     }
 )
-async def get_libro_by_id(id: int, db: Session = Depends(get_db)):
+async def get_libro_by_id(id: int = Path(..., ge=1, description='ID del libro'), db: Session = Depends(get_db)):
     try:
         # Consultamos el libro por su ID
         libro = db.query(Libro).filter(Libro.id == id).first()
@@ -92,12 +99,14 @@ async def get_libro_by_id(id: int, db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail='Libro no encontrado')
 
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        internal_logger.error(f'Error al obtener el libro: {str(e)}')
+        raise HTTPException(status_code=500, detail='Error obteniendo el libro')
     
 # Ruta para obtener un libro por su ISBN
 @libros_router.get(
     '/isbn/{isbn}',
     description='Obtener un libro por su ISBN',
+    response_model=LibroResponse,
     responses={
         200: {
             'description': 'Libro encontrado',
@@ -111,7 +120,7 @@ async def get_libro_by_id(id: int, db: Session = Depends(get_db)):
         }
     }
 )
-async def get_libro_by_isbn(isbn: str, db: Session = Depends(get_db)):
+async def get_libro_by_isbn(isbn: str = Path(..., min_length=10, description='ISBN del libro (10 caracteres mín.)'), db: Session = Depends(get_db)):
     try:
         # Comprobamos que el ISBN tenga 13 caracteres TODO: Podría hacerse una validación de ISBN de 10 dígitos
         validar_isbn(isbn)
@@ -126,12 +135,14 @@ async def get_libro_by_isbn(isbn: str, db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail='Libro no encontrado')
 
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        internal_logger.error(f'Error al obtener el libro: {str(e)}')
+        raise HTTPException(status_code=500, detail='Error obteniendo el libro')
     
 # Ruta para obtener todos los libros de un autor
 @libros_router.get(
     '/autor/{autor}',
     description='Obtener todos los libros de un autor',
+    response_model=list[LibroResponse],
     responses={
         200: {
             'description': 'Lista de libros',
@@ -145,7 +156,7 @@ async def get_libro_by_isbn(isbn: str, db: Session = Depends(get_db)):
         }
     }
 )
-async def get_libros_by_autor(autor: str, db: Session = Depends(get_db)):
+async def get_libros_by_autor(autor: str = Path(..., description = 'Nombre del autor'), db: Session = Depends(get_db)):
     try:
         # Consultamos los libros por el autor
         libros = db.query(Libro).filter(Libro.autor == autor).all()
@@ -157,12 +168,14 @@ async def get_libros_by_autor(autor: str, db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail='No hay libros del autor')
 
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        internal_logger.error(f'Error al obtener los libros: {str(e)}')
+        raise HTTPException(status_code=500, detail='Error obteniendo los libros')
     
 # Ruta para añadir un libro
 @libros_router.post(
     '/',
     description='Añadir un libro',
+    response_model=LibroResponse,
     responses={
         201: {
             'description': 'Libro añadido',
@@ -181,16 +194,34 @@ async def get_libros_by_autor(autor: str, db: Session = Depends(get_db)):
 )
 async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
     try:
+        # Comprobamos que el ISBN sea correcto
+        validar_isbn(libro.isbn)
         # Comprobamos que no haya un libro con el mismo ISBN
         if db.query(Libro).filter(Libro.isbn == libro.isbn).first():
             raise HTTPException(status_code=409, detail=f'El libro con el ISBN - {libro.isbn} - ya existe')
+        
+        # Obtenemos los géneros del libro
+        if libro.generos:
+            generos = db.query(Genero).filter(Genero.id.in_(libro.generos)).all()
+
+            if len(generos) != len(libro.generos):
+                raise HTTPException(status_code=400, detail='Uno o más géneros no existen')
 
         # Creamos el objeto Libro
-        nuevoLibro = Libro(**libro.dict())
-        
-        # Añadimos la fecha de creación y actualización
-        nuevoLibro.created_at = datetime.now()
-        nuevoLibro.updated_at = datetime.now()
+        nuevoLibro = Libro(
+            isbn=libro.isbn,
+            titulo=libro.titulo,
+            autor=libro.autor,
+            descripcion=libro.descripcion,
+            editorial=libro.editorial,
+            pais=libro.pais,
+            idioma=libro.idioma,
+            num_paginas=libro.num_paginas,
+            ano_edicion=libro.ano_edicion,
+            precio=libro.precio,
+            generos=generos,
+            created_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        )
 
         # Añadimos el libro a la base de datos
         db.add(nuevoLibro)
@@ -201,7 +232,8 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
         return nuevoLibro
 
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        internal_logger.error(f'Error al añadir el libro: {str(e)}')
+        raise HTTPException(status_code=500, detail='Error añadiendo el libro')
     
 # Ruta para descargar un PDF con la lista de libros
 @libros_router.get(

@@ -10,7 +10,7 @@ class LibroBase(BaseModel):
     descripcion: str
     editorial: str
     # Estos enteros son los IDs de los géneros
-    genero: list[int]
+    generos: list[int]
     pais: str
     idioma: str
     num_paginas: int
@@ -18,17 +18,17 @@ class LibroBase(BaseModel):
     precio: float
 
 class LibroCreate(LibroBase):
-    isbn: str = "9906453786057"
-    titulo: str = "El señor de los anillos"
-    autor: str = "J.R.R. Tolkien"
-    descripcion: str = "Un anillo para gobernarlos a todos, un anillo para encontrarlos, un anillo para atraerlos a todos y atarlos en las tinieblas."
-    editorial: str = "Minotauro"
-    genero: list[int] = [1, 2]
-    pais: str = "Reino Unido"
-    idioma: str = "Español"
-    num_paginas: int = 1216
-    ano_edicion: int = 1954
-    precio: float = 25.95
+    isbn: str 
+    titulo: str 
+    autor: str 
+    descripcion: str
+    editorial: str 
+    generos: list[int] 
+    pais: str 
+    idioma: str
+    num_paginas: int
+    ano_edicion: int 
+    precio: float 
 
 class LibroUpdate(LibroBase):
     pass
@@ -41,7 +41,7 @@ class Libro(LibroBase):
 
 class LibroResponse(LibroBase):
     id: int
-    genero: list[GeneroResponse]
+    generos: list[GeneroResponse]
 
     class Config:
         from_attributes = True
