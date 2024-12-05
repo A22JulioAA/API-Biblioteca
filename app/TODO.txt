@@ -1,3 +1,4 @@
 TODO: Crear modelo Autor y hacer una relación muchos a muchos con libro.
 TODO: Paginación de libros.
 TODO: Mejorar excepciones en los routers porque SQLAlchemyError es muy general.
+FIXME: Arreglar descarga de PDF de libros.

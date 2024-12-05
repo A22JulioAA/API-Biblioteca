@@ -354,7 +354,7 @@ async def delete_libro(id: int = Path(..., ge=1, description='ID del libro'), db
 
 # Ruta para descargar un PDF con la lista de libros
 @libros_router.get(
-    '/pdf',
+    '/pdf/download',
     description='Descargar un PDF con la lista de libros',
     responses={
         200: {

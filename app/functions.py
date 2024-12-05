@@ -1,23 +1,16 @@
 # Archivo para funciones varias
 
-from fpdf import FPDF
-from fastapi.responses import FileResponse
-import os
-
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 from schemas.libro_schemas import LibroResponse
 
 def generar_pdf(libros: list[LibroResponse], file_path: str):
-    pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-    pdf.set_font('Arial', 'B', 16)
+    c = canvas.Canvas(file_path, pagesize=letter)
 
-    pdf.cell(200, 10, 'Lista de libros', 0, 1, 'C')
+    c.setTitle("Listado de libros")
+    c.setAuthor("Julio Acuña")
 
-    for libro in libros:
-        pdf.ln(10)
-        pdf.set_font('Arial', 'B', 12)
-        pdf.cell(200, 10, f'Título: {libro.titulo}', 0, 1, ln=True)
-    
-    pdf.output(file_path)
+    c.drawString(100, 800, "Listado de libros")
+
+    c.save()
