@@ -256,7 +256,7 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
         }
     }
 )
-async def update_libro(id: int, libro_update: LibroUpdate, db: Session = Depends(get_db)):
+async def update_libro(libro_update: LibroUpdate, id: int = Path(..., ge=1, description='ID del libro'), db: Session = Depends(get_db)):
     try:
         libro = db.query(Libro).filter(Libro.id == id).first()
 
@@ -314,6 +314,43 @@ async def update_libro(id: int, libro_update: LibroUpdate, db: Session = Depends
     except SQLAlchemyError as e:
         internal_logger.error(f'Error al actualizar el libro: {str(e)}')
         raise HTTPException(status_code=500, detail='Error actualizando el libro')
+
+# Ruta para eliminar un libro
+@libros_router.delete(
+    '/{id}',
+    description='Eliminar un libro',
+    responses={
+        204: {
+            'description': 'Libro eliminado'
+        },
+        404: {
+            'description': 'Libro no encontrado'
+        },
+        500: {
+            'description': 'Error del servidor'
+        }
+    }
+)
+async def delete_libro(id: int = Path(..., ge=1, description='ID del libro'), db: Session = Depends(get_db)):
+    try:
+        # Consultamos el libro por su ID
+        libro = db.query(Libro).filter(Libro.id == id).first()
+
+        # Si el libro no existe, lanzamos una excepción
+        if not libro:
+            raise HTTPException(status_code=404, detail='Libro no encontrado')
+        
+        # Eliminamos el libro
+        db.delete(libro)
+        db.commit()
+
+        user_logger.info(f'Libro eliminado: {libro.titulo} - {libro.isbn}')
+        return None
+
+    except SQLAlchemyError as e:
+        internal_logger.error(f'Error al eliminar el libro: {str(e)}')
+        raise HTTPException(status_code=500, detail='Error eliminando el libro')
+
 
 # Ruta para descargar un PDF con la lista de libros
 @libros_router.get(
