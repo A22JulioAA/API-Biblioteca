@@ -20,6 +20,7 @@ from functions import generar_pdf
 from models.libro import Libro
 from schemas.libro_schemas import LibroResponse, LibroCreate, LibroUpdate
 from models.genero import Genero
+from models.autor import Autor
 
 # Importamos la función para obtener la base de datos
 from database import get_db
@@ -203,15 +204,24 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
         # Obtenemos los géneros del libro
         if libro.generos:
             generos = db.query(Genero).filter(Genero.id.in_(libro.generos)).all()
+            generos_ids = [genero.id for genero in generos]
 
             if len(generos) != len(libro.generos):
                 raise HTTPException(status_code=400, detail='Uno o más géneros no existen')
+
+        # Obtenemos los autores del libro
+        if libro.autores:
+            autores = db.query(Autor).filter(Autor.id.in_(libro.autores)).all()
+            autores_ids = [autor.id for autor in autores]
+
+            if len(autores) != len(libro.autores):
+                raise HTTPException(status_code=400, detail='Uno o más autores no existen')
 
         # Creamos el objeto Libro
         nuevoLibro = Libro(
             isbn=libro.isbn,
             titulo=libro.titulo,
-            autor=libro.autor,
+            autores=autores_ids,
             descripcion=libro.descripcion,
             editorial=libro.editorial,
             pais=libro.pais,
@@ -219,7 +229,7 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
             num_paginas=libro.num_paginas,
             ano_edicion=libro.ano_edicion,
             precio=libro.precio,
-            generos=generos,
+            generos=generos_ids,
             created_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         )
 

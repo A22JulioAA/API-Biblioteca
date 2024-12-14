@@ -16,7 +16,7 @@ from utilities import get_ip
 from database import init_db, get_db, get_db_info, insertar_datos_ejemplo
 
 # Modelos para crear las tablas de la base de datos
-from models import libro, user, prestamo, prestamo_libros, genero, libros_generos
+from models import libro, user, prestamo, prestamo_libros, genero, libros_generos, autor, libros_autores
 
 # Importamos las rutas de la API
 from routes.r_libro import libros_router

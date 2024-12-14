@@ -2,15 +2,16 @@ from pydantic import BaseModel
 from datetime import datetime
 
 from .genero_schemas import GeneroResponse
+from .autor_schemas import AutorResponse, AutorBasicResponse
 
 class LibroBase(BaseModel):
     isbn: str
     titulo: str
-    autor: str
+    autores: list[AutorBasicResponse]
     descripcion: str
     editorial: str
     # Estos enteros son los IDs de los géneros
-    generos: list[int]
+    generos: list[GeneroResponse]
     pais: str
     idioma: str
     num_paginas: int
@@ -20,7 +21,7 @@ class LibroBase(BaseModel):
 class LibroCreate(LibroBase):
     isbn: str 
     titulo: str 
-    autor: str 
+    autores: list[int] 
     descripcion: str
     editorial: str 
     generos: list[int] 
@@ -32,7 +33,7 @@ class LibroCreate(LibroBase):
 
 class LibroUpdate(LibroBase):
     titulo: str = None
-    autor: str = None
+    autores: list[int] = None
     descripcion: str = None
     editorial: str = None
     generos: list[int] = None
@@ -50,7 +51,6 @@ class Libro(LibroBase):
 
 class LibroResponse(LibroBase):
     id: int
-    generos: list[GeneroResponse]
 
     class Config:
         from_attributes = True
