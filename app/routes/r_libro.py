@@ -195,16 +195,17 @@ async def get_libros_by_autor(autor: str = Path(..., description = 'Nombre del a
 )
 async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
     try:
+        # ----------------------------- VALIDACIONES -----------------------------
         # Comprobamos que el ISBN sea correcto
         validar_isbn(libro.isbn)
         # Comprobamos que no haya un libro con el mismo ISBN
         if db.query(Libro).filter(Libro.isbn == libro.isbn).first():
             raise HTTPException(status_code=409, detail=f'El libro con el ISBN - {libro.isbn} - ya existe')
         
+        # ----------------------------- OBTENCIÓN DE DATOS -----------------------------
         # Obtenemos los géneros del libro
         if libro.generos:
             generos = db.query(Genero).filter(Genero.id.in_(libro.generos)).all()
-            generos_ids = [genero.id for genero in generos]
 
             if len(generos) != len(libro.generos):
                 raise HTTPException(status_code=400, detail='Uno o más géneros no existen')
@@ -212,16 +213,19 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
         # Obtenemos los autores del libro
         if libro.autores:
             autores = db.query(Autor).filter(Autor.id.in_(libro.autores)).all()
-            autores_ids = [autor.id for autor in autores]
 
             if len(autores) != len(libro.autores):
                 raise HTTPException(status_code=400, detail='Uno o más autores no existen')
+            
+        print(autores)
+        print(generos)
 
+        # ----------------------------- CREACIÓN DEL OBJETO LIBRO -----------------------------
         # Creamos el objeto Libro
         nuevoLibro = Libro(
             isbn=libro.isbn,
             titulo=libro.titulo,
-            autores=autores_ids,
+            autores=autores,
             descripcion=libro.descripcion,
             editorial=libro.editorial,
             pais=libro.pais,
@@ -229,7 +233,7 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
             num_paginas=libro.num_paginas,
             ano_edicion=libro.ano_edicion,
             precio=libro.precio,
-            generos=generos_ids,
+            generos=generos,
             created_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         )
 
@@ -239,7 +243,23 @@ async def add_libro(libro: LibroCreate, db: Session = Depends(get_db)):
         db.refresh(nuevoLibro)
 
         user_logger.info(f'Libro añadido: {nuevoLibro.titulo} - {nuevoLibro.isbn}')
-        return nuevoLibro
+        
+        return LibroResponse(
+            id=nuevoLibro.id,
+            isbn=nuevoLibro.isbn,
+            titulo=nuevoLibro.titulo,
+            autores=[autor.id for autor in nuevoLibro.autores],
+            generos=[genero.id for genero in nuevoLibro.generos], 
+            descripcion=nuevoLibro.descripcion,
+            editorial=nuevoLibro.editorial,
+            pais=nuevoLibro.pais,
+            idioma=nuevoLibro.idioma,
+            num_paginas=nuevoLibro.num_paginas,
+            ano_edicion=nuevoLibro.ano_edicion,
+            precio=float(nuevoLibro.precio) if nuevoLibro.precio else None,
+            created_at=nuevoLibro.created_at,
+            updated_at=nuevoLibro.updated_at,
+        )
 
     except SQLAlchemyError as e:
         internal_logger.error(f'Error al añadir el libro: {str(e)}')

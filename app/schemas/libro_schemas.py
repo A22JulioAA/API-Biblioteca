@@ -7,11 +7,12 @@ from .autor_schemas import AutorResponse, AutorBasicResponse
 class LibroBase(BaseModel):
     isbn: str
     titulo: str
-    autores: list[AutorBasicResponse]
+    # Estos enteros son los IDs de los autores
+    autores: list[int]
     descripcion: str
     editorial: str
     # Estos enteros son los IDs de los géneros
-    generos: list[GeneroResponse]
+    generos: list[int]
     pais: str
     idioma: str
     num_paginas: int
